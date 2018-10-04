@@ -1,3 +1,14 @@
+/src/config/
+/node_modules/
+
+awsConfig.json
+cert.pem
+dp_pool.js
+hashKey.js
+key.pem
+multer.js
+secretKey.js
+
 # Logs
 logs
 *.log

@@ -2,11 +2,9 @@ const express = require('express');
 const router = express.Router();
 
 //login
-const login = require('./login');
-router.use('/login', login);
+router.use('/login', require('./login.js'));
 
 //signup
-const signup = require('./signup');
-router.use('/signup',signup);
+router.use('/signup', require('./signup.js'));
 
 module.exports = router;

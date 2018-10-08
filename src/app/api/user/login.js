@@ -6,9 +6,9 @@ const jwt = require('../../module/jwt.js');
 
 router.post('/',async(req, res) =>{
     let user_id = req.body.user_id;
-	let user_pw = req.body.user_pw;
+	let user_pwd = req.body.user_pwd;
 
-    if (!user_id || !user_pw) {
+    if (!user_id || !user_pwd) {
 		res.status(400).send({
 			message : "Null Value"
 		});
@@ -23,8 +23,8 @@ router.post('/',async(req, res) =>{
 			});
 		} else if (checkResult.length === 1) {		// user_id 가 존재하는 경우
 			let token = jwt.sign(checkResult[0].user_idx);
-			let hashedpwd = await crypto.pbkdf2(user_pw, checkResult[0].user_salt, 100000, 32, 'sha512');	// 입력받은 pw를 DB에 존재하는 salt로 hashing
-	        if (hashedpwd.toString('base64') === checkResult[0].user_pw) {	// hashed 된 비밀번호 비교
+			let hashedpwd = await crypto.pbkdf2(user_pwd, checkResult[0].user_salt, 100000, 32, 'sha512');	// 입력받은 pw를 DB에 존재하는 salt로 hashing
+	        if (hashedpwd.toString('base64') === checkResult[0].user_pwd) {	// hashed 된 비밀번호 비교
     	        res.status(201).send({
 	                message: "Login Success",	//login 성공 
 					data : {

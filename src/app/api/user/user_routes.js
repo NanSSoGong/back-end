@@ -5,4 +5,8 @@ const router = express.Router();
 const login = require('./login');
 router.use('/login', login);
 
+//signup
+const signup = require('./signup');
+router.use('/signup',signup);
+
 module.exports = router;

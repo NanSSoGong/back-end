@@ -105,15 +105,14 @@ router.put('/:board_idx/:list_idx', async(req,res)=>{
         console.log('getList : ' + getList);
         if(!getList){
             res.status(500).send({
-                message: "Internel Server Error",
-                data : getList
+                message: "Internel Server Error"
             });
         }
         else{
             let list_name = req.body.list_name;
 
             if(!list_name){
-                console.log('hererere');
+                //console.log('hererere');
                 name = getList[0].list_name;
             }
 

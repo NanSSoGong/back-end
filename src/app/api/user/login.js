@@ -14,8 +14,8 @@ router.post('/',async(req, res) =>{
 		});
 	}else{
 		//user_id 로 index를 가져옴.
-		let checkQuery = 'SELECT * FROM user WHERE user_id = ?';
-		let checkResult = await db.execute2(checkQuery, [user_id]);	
+		let checkQuery = 'SELECT * FROM CardIt.User WHERE user_id = ?';
+		let checkResult = await db.execute2(checkQuery, user_id);	
 
 		if (!checkResult) {		//쿼리문 에러
 			res.status(500).send({

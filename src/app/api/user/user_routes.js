@@ -1,10 +1,13 @@
 const express = require('express');
 const router = express.Router();
 
+console.log("다은 3");
 //login
-router.use('/login', require('./login.js'));
+const login = require('./login');
+router.use('/login',login);
 
 //signup
-router.use('/signup', require('./signup.js'));
+const signup = require('./signup');
+router.use('/signup', signup);
 
 module.exports = router;

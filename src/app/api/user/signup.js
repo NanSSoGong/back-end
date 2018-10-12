@@ -3,21 +3,26 @@ const router = express.Router();
 const crypto = require('crypto-promise');
 const db = require('../../module/pool.js');
 
+console.log("다은 4");
 
 router.post('/', async (req, res) =>{
+    console.log("다은 5");
+
     let user_name = req.body.user_name;
     let user_phone = req.body.user_phone;
     let user_email = req.body.user_email;
     let user_id = req.body.user_id;
     let user_pwd = req.body.user_pwd;
 
+    console.log("user_id : ",user_id);
+
     if (!user_id || !user_pwd) {
 		res.status(400).send({
 			message : "Null Value"
 		});
 	} else {
-        let checkQuery = 'SELECT * FROM Cardit.User where user_id = ?';
-        let checkResult = await db.execute2(checkQuery, [user_id]);
+        let checkQuery = 'SELECT * FROM CardIt.User where user_id = ?';
+        let checkResult = await db.execute2(checkQuery, user_id);
 
         if(!checkResult){
             res.status(500).send({
@@ -29,10 +34,12 @@ router.post('/', async (req, res) =>{
             });
         } else{
             let salt = await crypto.randomBytes(32);
+            console.log("salt : "+ salt);
             const hashedpwd = await crypto.pbkdf2(user_pwd, salt.toString('base64'), 100000, 32, 'SHA512');
+            console.log("hashed pwd : " + hashedpwd);
             //정보 삽입 
-            let insertQuery = 'INSERT INTO user(user_name,user_phone,user_email,user_id, user_pwd, user_salt) VALUES(?, ?, ?, ?,?,?)';
-            let insertResult = await db.execute2(insertQuery, [user_name,user_phone,user_email,user_id, hashedpwd.toString('base64'), salt.toString('base64')]);
+            let insertQuery = 'INSERT INTO CardIt.User(user_name,user_phone,user_email,user_id, user_pwd, user_salt) VALUES(?,?,?,?,?,?)';
+            let insertResult = await db.queryParam_Arr(insertQuery, [user_name,user_phone,user_email,user_id, hashedpwd.toString('base64'), salt.toString('base64')]);
 
             if(!insertResult){
                 res.status(500).send({
@@ -45,6 +52,7 @@ router.post('/', async (req, res) =>{
             }
         }
     }
-})
+
+});
 
 module.exports = router;

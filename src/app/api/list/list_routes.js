@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 //list
-const list = require('./list');
-router.use('/list', list);
+const lists = require('./list');
+router.use('/', lists);
 
 module.exports = router;

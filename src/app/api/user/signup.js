@@ -3,18 +3,14 @@ const router = express.Router();
 const crypto = require('crypto-promise');
 const db = require('../../module/pool.js');
 
-console.log("다은 4");
 
 router.post('/', async (req, res) =>{
-    console.log("다은 5");
 
     let user_name = req.body.user_name;
     let user_phone = req.body.user_phone;
     let user_email = req.body.user_email;
     let user_id = req.body.user_id;
     let user_pwd = req.body.user_pwd;
-
-    console.log("user_id : ",user_id);
 
     if (!user_id || !user_pwd) {
 		res.status(400).send({

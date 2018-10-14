@@ -7,4 +7,7 @@ router.use('/list',list);
 const user = require('./api/user/user_routes');
 router.use('/user', user);
 
+const user = require('./api/user/board_routes');
+router.use('/user', user);
+
 module.exports = router;

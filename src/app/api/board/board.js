@@ -164,7 +164,7 @@ router.put('/:board_idx', async(req,res)=>{
 });
 
 //Share Board
-router.share('/:user_idx/:board_idx', async(req,res)=>{
+router.subscribe('/:user_idx/:board_idx', async(req,res)=>{
     const ID = jwt.verify(req.headers.authorization);
 
     if(ID != -1){

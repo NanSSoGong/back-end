@@ -106,20 +106,26 @@ module.exports = {
 			return result;
 		}
 	},
-	queryParamWithFunc : async (...args) => {
-		const query = args[0];
-		const value = args[1];	// array
-		const func = args[2];	// function
-		let result;
+	// queryParamWithFunc : async (...args) => {
+	// 	const query = args[0];
+    //     const value = args[1];	// array
+    //     let result;
+    //     let insertId;
 
-		try {
-			var connection = await pool.getConnection();			// connection을 pool에서 하나 가져온다.
-			result = await connection.query(query, value, func) || null;	// 두 번째 parameter에 배열 => query문에 들어갈 runtime 시 결정될 value
-		} catch(err) {
-			next(err);
-		} finally {
-			pool.releaseConnection(connection);		// waterfall 에서는 connection.release()를 사용했지만, 이 경우 pool.releaseConnection(connection) 을 해준다.
-			return result;
-		}
-	}
+	// 	try {
+	// 		var connection = await pool.getConnection();			// connection을 pool에서 하나 가져온다.
+	// 		result = await connection.query(query, value, function(err, res) {
+    //             if (err) throw err;
+    //             insertId = res.insertId;
+    //         }) || null;	// 두 번째 parameter에 배열 => query문에 들어갈 runtime 시 결정될 value
+	// 	} catch(err) {
+	// 		next(err);
+	// 	} finally {
+    //         pool.releaseConnection(connection);		// waterfall 에서는 connection.release()를 사용했지만, 이 경우 pool.releaseConnection(connection) 을 해준다.
+    //         return {
+    //             data: result,
+    //             insertId: insertId,
+    //         };
+	// 	}
+	// }
 };

@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
 
-//list
-const lists = require('./board');
-router.use('/', lists);
+//board
+const boards = require('./board');
+router.use('/', boards);
 
 module.exports = router;

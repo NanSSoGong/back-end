@@ -96,7 +96,7 @@ router.post('/:user_idx', async (req, res) =>{
             const checkResult = await db.execute3(checkQuery, board_name, user_idx);
 
             if(!checkResult){
-                res.status(500).send({mesaage : "Internal Server Error1"});
+                res.status(500).send({mesaage : "Internal Server Error"});
             } else if(checkResult[0].count > 0){
                 res.status(400).send({message : board_name + " board is already exist."});
             } else{
@@ -105,7 +105,7 @@ router.post('/:user_idx', async (req, res) =>{
                 const insertResult = await db.execute3(insertQuery, board_name, board_background);
 
                 if(!insertResult){
-                    res.status(500).send({message : "Internal Server Error2"});
+                    res.status(500).send({message : "Internal Server Error"});
                 } else{
                     const checkQuery = 'SELECT LAST_INSERT_ID() AS insertedId;';
                     const result = await db.queryParam_None(checkQuery);
@@ -115,12 +115,11 @@ router.post('/:user_idx', async (req, res) =>{
                     const insertResult = await db.execute4(insertQuery, user_idx, board_idx, 1);
                     
                     if(!insertResult){
-                        res.status(500).send({message : "Internal Server Error3"});
+                        res.status(500).send({message : "Internal Server Error"});
                     } else{
                         res.status(201).send({message : "Successful Add Board"});
                     }
                 }
-                console.log(4);
             }
         }
     } else{
@@ -194,7 +193,6 @@ router.put('/:board_idx/:user_idx', async(req,res)=>{
             if(!checkResult){
                 res.status(500).send({message : "Cannot Find The Board From DB"});
             } else if(checkResult[0].count != 0){
-                console.log(checkResult[0].count);
                 res.status(400).send({message : board_name + " is already exist."});
             } else {
                 //Update Board
@@ -208,7 +206,7 @@ router.put('/:board_idx/:user_idx', async(req,res)=>{
                 if (getUpdateList.length == 0) {
                     res.status(404).send({message: "Fail To Update Board"});
                 } else {
-                    res.status(201).send({message: "Successful Update List"});
+                    res.status(201).send({message: "Successful Update Board"});
                 }
             }
         }

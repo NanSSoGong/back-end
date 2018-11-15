@@ -42,9 +42,12 @@ router.post('/:board_idx',async(req, res) =>{
     const list_position_x = req.body.list_position_x;
     const list_position_y = req.body.list_position_y;
 
+    const getUserQuery = 'SELECT user_name FROM CardIt.User WHERE user_idx = ?';
     const insertListQuery = 'INSERT INTO CardIt.List(board_idx,list_name,list_position_x,list_position_y) VALUES(?,?,?,?)';
+    const insertHistoryQuery = 'INSERT INTO CardIt.History(board_idx,history_string) VALUES(?,?)';
 
     if(ID != -1){
+        const user_name = await db.execute2(getUserQuery,ID);
         const result = await db.queryParam_Arr(insertListQuery, [board_idx,list_name,list_position_x,list_position_y]);
         if(!result){
             res.status(500).send({
@@ -52,6 +55,8 @@ router.post('/:board_idx',async(req, res) =>{
             });
         }
         else{
+            const history_info= user_name[0].user_name + " added a " + list_name.toString() + " list";
+            const history_result = await db.execute3(insertHistoryQuery,board_idx,history_info);
             res.status(201).send({
                 message: "Successful Post List"
             });
@@ -69,9 +74,12 @@ router.delete('/:board_idx/:list_idx', async(req,res)=> {
     const board_idx = req.params.board_idx;
     const list_idx = req.params.list_idx;
 
+    const getUserQuery = 'SELECT user_name FROM CardIt.User WHERE user_idx = ?';
     const deleteListQuery = "DELETE FROM CardIt.List WHERE board_idx = ? AND list_idx = ?";
+    const insertHistoryQuery = 'INSERT INTO CardIt.History(board_idx,history_string) VALUES(?,?)';
 
     if(ID != -1){
+        const user_name = await db.execute2(getUserQuery,ID);
         const result = await db.execute3(deleteListQuery,board_idx,list_idx);
         if(!result){
             res.status(500).send({
@@ -79,6 +87,8 @@ router.delete('/:board_idx/:list_idx', async(req,res)=> {
             });
         }
         else{
+            const history_info= user_name[0].user_name + " deleted a " + list_name.toString() + " list";
+            const history_result = await db.execute3(insertHistoryQuery,board_idx,history_info);
             res.status(201).send({
                 message: "Successful Delete List"
             });
@@ -118,7 +128,8 @@ router.put('/:board_idx/:list_idx', async(req,res)=>{
 
             let data = {
                 list_name : list_name,
-                list_position_x : req.body.list_position_x ? req.body.list_position_x : getList[0].list_position_x
+                list_position_x : req.body.list_position_x ? req.body.list_position_x : getList[0].list_position_x,
+                list_position_y : req.body.list_position_y ? req.body.list_position_y : getList[0].list_position_y
             };
 
             let getUpdateList = await db.execute4(updateListQuery,data,board_idx,list_idx);

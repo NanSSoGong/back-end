@@ -119,7 +119,7 @@
 ## 개발자
 
 - **김다은** - [daeuni](https://github.com/daeuni) 
-- **이영진** - [daeuni](https://github.com/YounggLee)
+- **이영진** - [YounggLee](https://github.com/YounggLee)
 
 
 ## CardIt 의 다른 프로젝트

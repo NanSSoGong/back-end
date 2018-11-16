@@ -82,9 +82,9 @@ router.delete('/:card_idx', async(req,res)=> {
         if(!deleteResult){
             res.status(500).send({message: "Internel Server Error"});
         } else{
-            const history_info= user_name[0].user_name + " deleted a " + card_name.toString() + " list";
+            const history_info= user_name[0].user_name + " deleted a " + card_name.toString() + " card";
             const history_result = await db.execute3(insertHistoryQuery,board_idx,history_info);
-            res.status(201).send({message: "Successful Delete List"});
+            res.status(201).send({message: "Successful Delete Card"});
         }
     }else{
         res.status(403).send({

@@ -26,57 +26,6 @@ router.get('/:user_idx',async(req,res) =>{
     }
 });
 
-// //Add Board With Function
-// router.post('/:user_idx', async (req, res) =>{
-//     const ID = jwt.verify(req.headers.authorization);
-
-//     if(ID != -1){
-//         const user_idx = req.params.user_idx;
-//         const board_name = req.body.board_name;
-//         const board_background = !req.body.board_background ? 'null' : req.body.board_background;
-
-//         if (!user_idx || !board_name) {
-//             res.status(400).send({
-//                 message : "Null Value"
-//             });
-//         } else {
-//             //Check Duplication
-//             const checkQuery = "SELECT Count(*) AS count FROM CardIt.Board T1 LEFT JOIN CardIt.Link T2 ON T1.board_idx = T2.board_idx WHERE T1.board_name = ? AND T2.user_idx = ?";
-//             const checkResult = await db.execute3(checkQuery, board_name, user_idx);
-
-//             if(!checkResult){
-//                 res.status(500).send({mesaage : "Internal Server Error1"});
-//             } else if(checkResult[0].count > 0){
-//                 res.status(400).send({message : board_name + " board is already exist."});
-//             } else{
-//                 let board_idx;
-//                 const insertQuery = 'INSERT INTO CardIt.Board(board_name, board_background) VALUES(?, ?);';
-//                 console.log('start');
-//                 const result = await db.queryParamWithFunc(insertQuery, [board_name, board_background]);
-//                 console.log('done');
-
-//                 if(!result.data){
-//                     res.status(500).send({message : "Internal Server Error2"});
-//                 } else{
-//                     const insertQuery = 'INSERT INTO CardIt.Link(user_idx, board_idx, board_master) VALUES(?, ?, ?);';
-//                     const insertResult = await db.execute4(insertQuery, user_idx, board_idx, 1);
-                    
-//                     if(!insertResult){
-//                         res.status(500).send({message : "Internal Server Error3"});
-//                     } else{
-//                         res.status(201).send({message : "Successful Add Board"});
-//                     }
-//                 }
-//                 console.log(4);
-//             }
-//         }
-//     } else{
-//         res.status(403).send({
-//             message: 'Access Denied'
-//         });
-//     }
-// })
-
 //Add Board
 router.post('/:user_idx', async (req, res) =>{
     const ID = jwt.verify(req.headers.authorization);
@@ -85,6 +34,7 @@ router.post('/:user_idx', async (req, res) =>{
         const user_idx = req.params.user_idx;
         const board_name = req.body.board_name;
         const board_background = !req.body.board_background ? 'null' : req.body.board_background;
+        const getUserQuery = 'SELECT user_name FROM CardIt.User WHERE user_idx = ?';
 
         if (!user_idx || !board_name) {
             res.status(400).send({
@@ -93,7 +43,10 @@ router.post('/:user_idx', async (req, res) =>{
         } else {
             //Check Duplication
             const checkQuery = "SELECT Count(*) AS count FROM CardIt.Board T1 LEFT JOIN CardIt.Link T2 ON T1.board_idx = T2.board_idx WHERE T1.board_name = ? AND T2.user_idx = ?";
+            const insertHistoryQuery = 'INSERT INTO CardIt.History(board_idx,history_string) VALUES(?,?)';
             const checkResult = await db.execute3(checkQuery, board_name, user_idx);
+
+            const user_name = await db.execute2(getUserQuery,ID);
 
             if(!checkResult){
                 res.status(500).send({mesaage : "Internal Server Error"});
@@ -117,6 +70,8 @@ router.post('/:user_idx', async (req, res) =>{
                     if(!insertResult){
                         res.status(500).send({message : "Internal Server Error"});
                     } else{
+                        const history_info= user_name[0].user_name + " added a " + board_name.toString() + " board";
+                        const history_result = await db.execute3(insertHistoryQuery,board_idx,history_info);
                         res.status(201).send({message : "Successful Add Board"});
                     }
                 }
@@ -138,6 +93,12 @@ router.delete('/:user_idx/:board_idx/:board_master', async(req,res)=> {
         const board_idx = req.params.board_idx;
         const board_master = req.params.board_master;
 
+        const insertHistoryQuery = 'INSERT INTO CardIt.History(board_idx,history_string) VALUES(?,?)';
+        const getUserQuery = 'SELECT user_name FROM CardIt.User WHERE user_idx = ?';
+        const getBoardName = 'SELECT board_name FROM CardIt.Board WHERE board_idx = ?';
+        const user_name = await db.execute2(getUserQuery,ID);
+        const board_name = await db.execute2(getBoardName, board_idx);
+
         if(board_master == 1){
             //Delete From Board Master(Delete)
             const deleteListQuery1 = "DELETE FROM CardIt.Link WHERE board_idx = ?;";
@@ -148,6 +109,8 @@ router.delete('/:user_idx/:board_idx/:board_master', async(req,res)=> {
             if(!deleteResult1 || !deleteResult2){
                 res.status(500).send({message: "Internel Server Error"});
             } else{
+                const history_info= user_name[0].user_name + " deleted a " + board_name.toString() + " board";
+                const history_result = await db.execute3(insertHistoryQuery,board_idx,history_info);
                 res.status(201).send({message: "Successful Delete List"});
             }
         } else {
@@ -158,7 +121,7 @@ router.delete('/:user_idx/:board_idx/:board_master', async(req,res)=> {
             if(!deleteResult){
                 res.status(500).send({message: "Internel Server Error"});
             } else{
-                res.status(201).send({message: "Successful Delete List"});
+                res.status(201).send({message: "Successful Delete Board"});
             }
         }
     }else{

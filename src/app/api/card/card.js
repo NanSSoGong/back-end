@@ -36,6 +36,9 @@ router.post('/:list_idx', async (req, res) =>{
         const card_end_date = !req.body.card_end_date ? null : req.body.card_end_date;
         const card_order = !req.body.card_order ? 1 : req.body.card_order;
         const card_content = !req.body.card_content ? null : req.body.card_content;
+        //get user name
+        const getUserQuery = 'SELECT user_name FROM CardIt.User WHERE user_idx = ?';
+        const user_name = await db.execute2(getUserQuery,ID);
 
         if (!list_idx || !card_name) {
             res.status(400).send({
@@ -44,10 +47,14 @@ router.post('/:list_idx', async (req, res) =>{
         } else {
             const insertQuery = 'INSERT INTO CardIt.Card(list_idx, card_name, card_end_date, card_order, card_content, card_mark) VALUES(1, ?, ?, ?, ?, 0);';
             const insertResult = await db.queryParam_Arr(insertQuery, [card_name, card_end_date, card_order, card_content]);
+            //insert history
+            const insertHistoryQuery = 'INSERT INTO CardIt.History(board_idx,history_string) VALUES(?,?)';
 
             if(!insertResult){
                 res.status(500).send({message : "Internal Server Error"});
             } else{
+                const history_info= user_name[0].user_name + " added a " + card_name.toString() + " card";
+                const history_result = await db.execute3(insertHistoryQuery,board_idx,history_info);
                 res.status(201).send({message : "Successful Add Card"});
             }
         }
@@ -61,15 +68,22 @@ router.post('/:list_idx', async (req, res) =>{
 //Delete Card
 router.delete('/:card_idx', async(req,res)=> {
     const ID = jwt.verify(req.headers.authorization);
+    const getUserQuery = 'SELECT user_name FROM CardIt.User WHERE user_idx = ?';
+    const insertHistoryQuery = 'INSERT INTO CardIt.History(board_idx,history_string) VALUES(?,?)';
 
     if(ID != -1){
+        const user_name = await db.execute2(getUserQuery,ID);
         const card_idx = req.params.card_idx;
         const deleteListQuery = "DELETE FROM CardIt.Card WHERE card_idx = ?";
+        const getCardNameQuery = "SELECT card_name FROM CardIt.Card WHERE card_idx = ?";
         const deleteResult = await db.execute3(deleteListQuery, card_idx);
+        const card_name = await db.execute2(getCardNameQuery,card_idx);
 
         if(!deleteResult){
             res.status(500).send({message: "Internel Server Error"});
         } else{
+            const history_info= user_name[0].user_name + " deleted a " + card_name.toString() + " list";
+            const history_result = await db.execute3(insertHistoryQuery,board_idx,history_info);
             res.status(201).send({message: "Successful Delete List"});
         }
     }else{

@@ -1,4 +1,4 @@
-# 2018년 소프트웨어공학 웹 프로젝트 'CardIt'
+# 2018년 소프트웨어공학 웹 프로젝트 'Card it'
 
 * API 명세서 : https://github.com/NanSSoGong/back-end/wiki
 

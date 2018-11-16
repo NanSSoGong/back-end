@@ -11,7 +11,7 @@ router.get('/:board_idx',async(req,res) =>{
     if(ID != -1){
         const board_idx = req.params.board_idx;
 
-        const getListQuery = 'SELECT * FROM CardIt.Card T1 LEFT JOIN CardIt.List T2 ON T1.list_idx = T2.list_idx WHERE T2.board_idx = 1;';
+        const getListQuery = 'SELECT * FROM CardIt.Card T1 RIGHT JOIN CardIt.List T2 ON T1.list_idx = T2.list_idx WHERE T2.board_idx = ? ORDER BY T2.list_idx;';
         const result = await db.execute2(getListQuery, board_idx);
         if(!result){
             res.status(500).send({message: "Internel Server Error"});

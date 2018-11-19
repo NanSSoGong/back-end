@@ -27,10 +27,11 @@ router.get('/:board_idx',async(req,res) =>{
 });
 
 //Add Card
-router.post('/:list_idx', async (req, res) =>{
+router.post('/:board_idx/:list_idx', async (req, res) =>{
     const ID = jwt.verify(req.headers.authorization);
 
     if(ID != -1){
+        const board_idx = req.params.board_idx;
         const list_idx = req.params.list_idx;
         const card_name = req.body.card_name;
         const card_end_date = !req.body.card_end_date ? null : req.body.card_end_date;
@@ -66,13 +67,14 @@ router.post('/:list_idx', async (req, res) =>{
 })
 
 //Delete Card
-router.delete('/:card_idx', async(req,res)=> {
+router.delete('/:board_idx/:card_idx', async(req,res)=> {
     const ID = jwt.verify(req.headers.authorization);
     const getUserQuery = 'SELECT user_name FROM CardIt.User WHERE user_idx = ?';
     const insertHistoryQuery = 'INSERT INTO CardIt.History(board_idx,history_string) VALUES(?,?)';
 
     if(ID != -1){
         const user_name = await db.execute2(getUserQuery,ID);
+        const board_idx = req.params.board_idx;
         const card_idx = req.params.card_idx;
         const deleteListQuery = "DELETE FROM CardIt.Card WHERE card_idx = ?";
         const getCardNameQuery = "SELECT card_name FROM CardIt.Card WHERE card_idx = ?";
@@ -95,7 +97,7 @@ router.delete('/:card_idx', async(req,res)=> {
 });
 
 //Edit Card
-router.put('/:list_idx/:card_idx', async(req,res)=>{
+router.put('/:board_idx/:list_idx/:card_idx', async(req,res)=>{
     const ID = jwt.verify(req.headers.authorization);
 
     if(ID != -1){

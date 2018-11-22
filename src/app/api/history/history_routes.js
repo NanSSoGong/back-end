@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-//card
+//history
 const history = require('./history');
 router.use('/', history);
 

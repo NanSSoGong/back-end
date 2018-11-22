@@ -13,4 +13,10 @@ router.use('/board', board);
 const card = require('./api/card/card_routes');
 router.use('/card', card);
 
+const calender = require('./api/calender/calender_routes');
+router.use('/calender', calender);
+
+const history = require('./api/history/history_routes');
+router.use('/history', history);
+
 module.exports = router;

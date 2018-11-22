@@ -32,7 +32,7 @@ router.get('/',async(req,res) =>{
 });
 
 //Get Emergency Card in Board
-router.get('/:board_idx',async(req,res) =>{
+router.get('/emergency/:board_idx',async(req,res) =>{
     const ID = jwt.verify(req.headers.authorization);
     if(ID != -1){
         const board_idx = req.params.board_idx;
@@ -43,10 +43,41 @@ router.get('/:board_idx',async(req,res) =>{
             res.status(500).send({message: "Internel Server Error"});
         } else{
             res.status(201).send({
-                message: "Successful Get Board Calender",
+                message: "Successful Get Emergency Board Calender",
                 data : result
             });
         }
+    }else{
+        res.status(403).send({message: 'Access Denied'});
+    }
+});
+
+//Get Calendar Card in Board
+router.get('/:board_idx',async(req,res) =>{
+    const ID = jwt.verify(req.headers.authorization);
+    const board_idx = req.params.board_idx;
+    const card_month_date = req.body.card_month_date;
+
+    if(ID != -1){
+        if(!board_idx || !card_month_date)
+        {
+            res.status(400).send({
+                message : "Null Value"
+            });
+        }else{
+            const getEmergencyQuery = 'SELECT card_name, list_name, board_name FROM CardIt.Card a INNER JOIN CardIt.List b on a.list_idx = b.list_idx INNER JOIN CardIt.Board c on b.board_idx = c.board_idx where substr(a.card_end_date,1,7)  =? AND c.board_idx = ?;';
+            const result = await db.execute3(getEmergencyQuery, card_month_date,board_idx);
+
+            if(!result){
+                res.status(500).send({message: "Internel Server Error"});
+            } else{
+                res.status(201).send({
+                    message: "Successful Get Board Calender",
+                    data : result
+                });
+            }
+        }
+        
     }else{
         res.status(403).send({message: 'Access Denied'});
     }

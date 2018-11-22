@@ -9,14 +9,14 @@ router.get('/',async(req,res) =>{
     const ID = jwt.verify(req.headers.authorization);
     const card_end_date = req.body.card_end_date;
     if(ID != -1){
-        const getEmergencyQuery = 'SELECT card_name, list_name, board_name, card_mark, card_end_date FROM CardIt.Card a INNER JOIN CardIt.List b on a.list_idx = b.list_idx INNER JOIN CardIt.Board c on b.board_idx = c.board_idx where c.user_idx = ? AND a.card_end_date = ?;';
+        const getCardQuery = 'SELECT card_name, list_name, board_name, card_mark, card_end_date FROM CardIt.Card a INNER JOIN CardIt.List b on a.list_idx = b.list_idx INNER JOIN CardIt.Board c on b.board_idx = c.board_idx INNER JOIN CardIt.Link d on d.board_idx = c.board_idx where d.user_idx = ? AND a.card_end_date = ?;';
         if (!card_end_date) {
             res.status(400).send({
                 message : "Null Value"
             });
         }
         else{
-            const result = await db.execute3(getEmergencyQuery, ID, card_end_date);
+            const result = await db.execute3(getCardQuery, ID, card_end_date);
             if(!result){
                 res.status(500).send({message: "Internel Server Error"});
             } else{

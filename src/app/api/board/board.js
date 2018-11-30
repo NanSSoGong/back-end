@@ -70,7 +70,7 @@ router.post('/:user_idx', async (req, res) =>{
                     if(!insertResult){
                         res.status(500).send({message : "Internal Server Error"});
                     } else{
-                        const history_info= user_name[0].user_name + " added a " + board_name.toString() + " board";
+                        const history_info= user_name[0].user_name + " created a " + board_name.toString() + " board";
                         const history_result = await db.execute3(insertHistoryQuery,board_idx,history_info);
                         res.status(201).send({message : "Successful Add Board"});
                     }
@@ -189,8 +189,12 @@ router.link('/:user_idx/:board_idx', async(req,res)=>{
         const user_idx = req.params.user_idx;
         const board_idx = req.params.board_idx;
     
+        const insertHistoryQuery = 'INSERT INTO CardIt.History(board_idx,history_string) VALUES(?,?)';
         const getListQuery = 'SELECT * FROM CardIt.Board WHERE board_idx = ?';
+        const getUsernameQuery = 'SELECT user_name FROM CardIt.User where user_idx=?;';
         const getList = await db.execute2(getListQuery, board_idx);
+        const user_name = await db.execute2(getUsernameQuery, user_idx);
+        const my_name = await db.execute2(getUsernameQuery,ID);
 
         if(!getList){
             res.status(500).send({
@@ -201,7 +205,10 @@ router.link('/:user_idx/:board_idx', async(req,res)=>{
             const insertResult = await db.execute3(insertQuery, user_idx, board_idx);
 
             if (!insertResult) {
+                const history_info=  my_name[0].user_name + " invited a "+ user_name[0].user_name;
+                const history_result = await db.execute3(insertHistoryQuery,board_idx,history_info);
                 res.status(404).send({message: "Fail To Share Board"});
+                
             } else {
                 res.status(201).send({message: "Successful Share Board"});
             }

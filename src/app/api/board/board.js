@@ -3,6 +3,10 @@ const router = express.Router();
 const crypto = require('crypto-promise');
 const db = require('../../module/pool.js');
 const jwt = require('../../module/jwt.js');
+require('date-utils');
+
+var dt = new Date();
+var d = dt.toFormat('YYYY-MM-DD');
 
 //Get Board List
 router.get('/:user_idx',async(req,res) =>{
@@ -35,7 +39,8 @@ router.post('/:user_idx', async (req, res) =>{
         const board_name = req.body.board_name;
         const board_background = !req.body.board_background ? 'null' : req.body.board_background;
         const getUserQuery = 'SELECT user_name FROM CardIt.User WHERE user_idx = ?';
-
+        console.log("시각 : "+ d);
+        
         if (!user_idx || !board_name) {
             res.status(400).send({
                 message : "Null Value"
@@ -43,7 +48,7 @@ router.post('/:user_idx', async (req, res) =>{
         } else {
             //Check Duplication
             const checkQuery = "SELECT Count(*) AS count FROM CardIt.Board T1 LEFT JOIN CardIt.Link T2 ON T1.board_idx = T2.board_idx WHERE T1.board_name = ? AND T2.user_idx = ?";
-            const insertHistoryQuery = 'INSERT INTO CardIt.History(board_idx,history_string) VALUES(?,?)';
+            const insertHistoryQuery = 'INSERT INTO CardIt.History(board_idx,history_string,history_date) VALUES(?,?,?)';
             const checkResult = await db.execute3(checkQuery, board_name, user_idx);
 
             const user_name = await db.execute2(getUserQuery,ID);
@@ -71,7 +76,10 @@ router.post('/:user_idx', async (req, res) =>{
                         res.status(500).send({message : "Internal Server Error"});
                     } else{
                         const history_info= user_name[0].user_name + " created a " + board_name.toString() + " board";
-                        const history_result = await db.execute3(insertHistoryQuery,board_idx,history_info);
+                        console.log(d);
+                        console.log(board_idx);
+                        const history_result = await db.execute4(insertHistoryQuery,board_idx,history_info,d);
+                        if(!history_result) console.log("history fail");
                         res.status(201).send({message : "Successful Add Board"});
                     }
                 }
@@ -93,7 +101,7 @@ router.delete('/:user_idx/:board_idx/:board_master', async(req,res)=> {
         const board_idx = req.params.board_idx;
         const board_master = req.params.board_master;
 
-        const insertHistoryQuery = 'INSERT INTO CardIt.History(board_idx,history_string) VALUES(?,?)';
+        const insertHistoryQuery = 'INSERT INTO CardIt.History(board_idx,history_string,history_date) VALUES(?,?,?)';
         const getUserQuery = 'SELECT user_name FROM CardIt.User WHERE user_idx = ?';
         const getBoardName = 'SELECT board_name FROM CardIt.Board WHERE board_idx = ?';
         const user_name = await db.execute2(getUserQuery,ID);
@@ -110,7 +118,7 @@ router.delete('/:user_idx/:board_idx/:board_master', async(req,res)=> {
                 res.status(500).send({message: "Internel Server Error"});
             } else{
                 const history_info= user_name[0].user_name + " deleted a " + board_name.toString() + " board";
-                const history_result = await db.execute3(insertHistoryQuery,board_idx,history_info);
+                const history_result = await db.execute4(insertHistoryQuery,board_idx,history_info,d);
                 res.status(201).send({message: "Successful Delete List"});
             }
         } else {
@@ -189,7 +197,7 @@ router.link('/:user_idx/:board_idx', async(req,res)=>{
         const user_idx = req.params.user_idx;
         const board_idx = req.params.board_idx;
     
-        const insertHistoryQuery = 'INSERT INTO CardIt.History(board_idx,history_string) VALUES(?,?)';
+        const insertHistoryQuery = 'INSERT INTO CardIt.History(board_idx,history_string,history_date) VALUES(?,?,?)';
         const getListQuery = 'SELECT * FROM CardIt.Board WHERE board_idx = ?';
         const getUsernameQuery = 'SELECT user_name FROM CardIt.User where user_idx=?;';
         const getList = await db.execute2(getListQuery, board_idx);
@@ -206,7 +214,7 @@ router.link('/:user_idx/:board_idx', async(req,res)=>{
 
             if (!insertResult) {
                 const history_info=  my_name[0].user_name + " invited a "+ user_name[0].user_name;
-                const history_result = await db.execute3(insertHistoryQuery,board_idx,history_info);
+                const history_result = await db.execute4(insertHistoryQuery,board_idx,history_info,d);
                 res.status(404).send({message: "Fail To Share Board"});
                 
             } else {

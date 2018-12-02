@@ -3,6 +3,10 @@ const router = express.Router();
 const crypto = require('crypto-promise');
 const db = require('../../module/pool.js');
 const jwt = require('../../module/jwt.js');
+require('date-utils');
+
+var dt = new Date();
+var d = dt.toFormat('YYYY-MM-DD');
 
 //get, put, post, delete
 
@@ -44,7 +48,7 @@ router.post('/:board_idx',async(req, res) =>{
 
     const getUserQuery = 'SELECT user_name FROM CardIt.User WHERE user_idx = ?';
     const insertListQuery = 'INSERT INTO CardIt.List(board_idx,list_name,list_position_x,list_position_y) VALUES(?,?,?,?)';
-    const insertHistoryQuery = 'INSERT INTO CardIt.History(board_idx,history_string) VALUES(?,?)';
+    const insertHistoryQuery = 'INSERT INTO CardIt.History(board_idx,history_string,history_date) VALUES(?,?,?)';
 
     if(ID != -1){
         const user_name = await db.execute2(getUserQuery,ID);
@@ -56,7 +60,7 @@ router.post('/:board_idx',async(req, res) =>{
         }
         else{
             const history_info= user_name[0].user_name + " added a " + list_name.toString() + " list";
-            const history_result = await db.execute3(insertHistoryQuery,board_idx,history_info);
+            const history_result = await db.execute4(insertHistoryQuery,board_idx,history_info,d);
             res.status(201).send({
                 message: "Successful Post List"
             });
@@ -76,7 +80,7 @@ router.delete('/:board_idx/:list_idx', async(req,res)=> {
 
     const getUserQuery = 'SELECT user_name FROM CardIt.User WHERE user_idx = ?';
     const deleteListQuery = "DELETE FROM CardIt.List WHERE board_idx = ? AND list_idx = ?";
-    const insertHistoryQuery = 'INSERT INTO CardIt.History(board_idx,history_string) VALUES(?,?)';
+    const insertHistoryQuery = 'INSERT INTO CardIt.History(board_idx,history_string,history_date) VALUES(?,?,?)';
 
     if(ID != -1){
         const user_name = await db.execute2(getUserQuery,ID);
@@ -88,7 +92,7 @@ router.delete('/:board_idx/:list_idx', async(req,res)=> {
         }
         else{
             const history_info= user_name[0].user_name + " deleted a " + list_name.toString() + " list";
-            const history_result = await db.execute3(insertHistoryQuery,board_idx,history_info);
+            const history_result = await db.execute4(insertHistoryQuery,board_idx,history_info,d);
             res.status(201).send({
                 message: "Successful Delete List"
             });

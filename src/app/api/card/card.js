@@ -3,6 +3,10 @@ const router = express.Router();
 const crypto = require('crypto-promise');
 const db = require('../../module/pool.js');
 const jwt = require('../../module/jwt.js');
+require('date-utils');
+
+var dt = new Date();
+var d = dt.toFormat('YYYY-MM-DD');
 
 //Get Card List
 router.get('/:board_idx',async(req,res) =>{
@@ -49,13 +53,13 @@ router.post('/:board_idx/:list_idx', async (req, res) =>{
             const insertQuery = 'INSERT INTO CardIt.Card(list_idx, card_name, card_end_date, card_order, card_content, card_mark) VALUES(1, ?, ?, ?, ?, 0);';
             const insertResult = await db.queryParam_Arr(insertQuery, [card_name, card_end_date, card_order, card_content]);
             //insert history
-            const insertHistoryQuery = 'INSERT INTO CardIt.History(board_idx,history_string) VALUES(?,?)';
+            const insertHistoryQuery = 'INSERT INTO CardIt.History(board_idx,history_string,history_date) VALUES(?,?,?)';
 
             if(!insertResult){
                 res.status(500).send({message : "Internal Server Error"});
             } else{
                 const history_info= user_name[0].user_name + " added a " + card_name.toString() + " card";
-                const history_result = await db.execute3(insertHistoryQuery,board_idx,history_info);
+                const history_result = await db.execute4(insertHistoryQuery,board_idx,history_info,d);
                 res.status(201).send({message : "Successful Add Card"});
             }
         }
@@ -70,7 +74,7 @@ router.post('/:board_idx/:list_idx', async (req, res) =>{
 router.delete('/:board_idx/:card_idx', async(req,res)=> {
     const ID = jwt.verify(req.headers.authorization);
     const getUserQuery = 'SELECT user_name FROM CardIt.User WHERE user_idx = ?';
-    const insertHistoryQuery = 'INSERT INTO CardIt.History(board_idx,history_string) VALUES(?,?)';
+    const insertHistoryQuery = 'INSERT INTO CardIt.History(board_idx,history_string,history_date) VALUES(?,?,?)';
 
     if(ID != -1){
         const user_name = await db.execute2(getUserQuery,ID);
@@ -85,7 +89,7 @@ router.delete('/:board_idx/:card_idx', async(req,res)=> {
             res.status(500).send({message: "Internel Server Error"});
         } else{
             const history_info= user_name[0].user_name + " deleted a " + card_name.toString() + " card";
-            const history_result = await db.execute3(insertHistoryQuery,board_idx,history_info);
+            const history_result = await db.execute4(insertHistoryQuery,board_idx,history_info,d);
             res.status(201).send({message: "Successful Delete Card"});
         }
     }else{

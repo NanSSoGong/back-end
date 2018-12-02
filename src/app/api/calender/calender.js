@@ -62,8 +62,9 @@ router.get('/emergency/:user_idx/:board_idx',async(req,res) =>{
 });
 
 //Get Calendar Card in Board
-router.get('/:board_idx',async(req,res) =>{
+router.get('/:user_idx/:board_idx',async(req,res) =>{
     const ID = jwt.verify(req.headers.authorization);
+    const user_idx = req.params.user_idx;
     const board_idx = req.params.board_idx;
     const card_month_date = req.body.card_month_date;
 
@@ -73,9 +74,17 @@ router.get('/:board_idx',async(req,res) =>{
             res.status(400).send({
                 message : "Null Value"
             });
-        }else{
-            const getEmergencyQuery = 'SELECT card_name, list_name, board_name FROM CardIt.Card a INNER JOIN CardIt.List b on a.list_idx = b.list_idx INNER JOIN CardIt.Board c on b.board_idx = c.board_idx where substr(a.card_end_date,1,7)  =? AND c.board_idx = ?;';
-            const result = await db.execute3(getEmergencyQuery, card_month_date,board_idx);
+        } else {
+            let getEmergencyQuery;
+            let result;
+            if (board_idx && board_idx != -1) {
+                getEmergencyQuery = 'SELECT a.card_name, b.list_name, c.board_name, a.card_end_date, a.card_content, a.card_mark FROM CardIt.Card a INNER JOIN CardIt.List b on a.list_idx = b.list_idx INNER JOIN CardIt.Board c on b.board_idx = c.board_idx where substr(a.card_end_date,1,7)  =? AND c.board_idx = ?;';
+                result = await db.execute3(getEmergencyQuery, card_month_date, board_idx);
+            }
+            else {
+                getEmergencyQuery = 'SELECT a.card_name, b.list_name, c.board_name, a.card_end_date, a.card_content, a.card_mark FROM CardIt.Card a INNER JOIN CardIt.List b on a.list_idx = b.list_idx INNER JOIN CardIt.Board c on b.board_idx = c.board_idx INNER JOIN CardIt.Link d on c.board_idx = d.board_idx WHERE substr(a.card_end_date,1,7)  = ? AND d.user_idx = ?;';
+                result = await db.execute3(getEmergencyQuery, card_month_date, user_idx);
+            }
 
             if(!result){
                 res.status(500).send({message: "Internel Server Error"});

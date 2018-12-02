@@ -12,10 +12,19 @@ var hash = require('./src/config/hashKey');
 var routes = require('./src/app/routes');
 
 var app = express();
-
 //cors
-const cors = require('cors');
-app.use(cors());
+var cors = require('cors');
+var whitelist = ['*'];
+var corsOptions = {
+  origin : function(origin, callback){
+    var isWhitelisted = whitelist.indexOf(origin) != -1;
+    callback(null, isWhitelisted);
+  },
+  credentials:true
+}
+
+
+app.use(cors(corsOptions));
 app.use(helmet())
 
 // view engine setup

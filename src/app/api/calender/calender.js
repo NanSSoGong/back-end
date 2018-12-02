@@ -92,7 +92,7 @@ router.put('/', async (req, res) =>{
         const card_mark = req.body.card_mark;
         const insertCardMark = 'UPDATE CardIt.Card SET card_mark = ? WHERE card_name = ?;';
 
-        if (!card_name || !card_mark) {
+        if (!card_name) {
             res.status(400).send({
                 message : "Null Value"
             });

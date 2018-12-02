@@ -37,7 +37,6 @@ router.get('/emergency/:user_idx/:board_idx',async(req,res) =>{
     if(ID != -1){
         const user_idx = req.params.user_idx;
         const board_idx = req.params.board_idx;
-
         let getEmergencyQuery, result;
 
         if (board_idx && board_idx != -1) {
@@ -45,7 +44,7 @@ router.get('/emergency/:user_idx/:board_idx',async(req,res) =>{
             result = await db.execute2(getEmergencyQuery, board_idx);
         }
         else {
-            getEmergencyQuery = 'SELECT card_name, list_name, board_name, card_mark FROM CardIt.Card a INNER JOIN CardIt.List b on a.list_idx = b.list_idx INNER JOIN CardIt.Board c on b.board_idx = c.board_idx INNER JOIN CardIt.Link d on d.board_idx = c.board_idx WHERE card_end_date > (NOW() - INTERVAL 7 DAY) AND d.user_idx = 1;';
+            getEmergencyQuery = 'SELECT card_name, list_name, board_name, card_mark FROM CardIt.Card a INNER JOIN CardIt.List b on a.list_idx = b.list_idx INNER JOIN CardIt.Board c on b.board_idx = c.board_idx INNER JOIN CardIt.Link d on d.board_idx = c.board_idx WHERE card_end_date > (NOW() - INTERVAL 7 DAY) AND d.user_idx =?;';
             result = await db.execute2(getEmergencyQuery, user_idx);
         }
 

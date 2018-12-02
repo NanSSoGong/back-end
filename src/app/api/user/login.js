@@ -28,7 +28,11 @@ router.post('/',async(req, res) =>{
     	        res.status(201).send({
 	                message: "Login Success",	//login 성공 
 					data : {
-						message : checkResult,
+						user_idx  : checkResult[0].user_idx,
+						user_name : checkResult[0].user_name,
+						user_email : checkResult[0].user_email,
+						user_phone : checkResult[0].user_phone,
+						user_id : checkResult[0].user_id,
 						token : token
 					}
 	            });

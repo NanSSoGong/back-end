@@ -155,4 +155,82 @@ router.put('/:board_idx/:list_idx', async(req,res)=>{
 
 });
 
+// router.put('/:board_idx', async(req,res)=>{
+//     const ID = jwt.verify(req.headers.authorization);
+//     const board_idx = req.params.board_idx;
+
+//     if(ID != -1){
+//         let insertedList = req.body.insertedList;
+//         let updatedList = req.body.updatedList;
+//         let deletedList = req.body.deletedList;
+//         let result;
+//         let list_idx;
+
+//         const getUserQuery = 'SELECT user_name FROM CardIt.User WHERE user_idx = ?';
+//         const insertListQuery = 'INSERT INTO CardIt.List(board_idx, list_name, list_position_x, list_position_y) VALUES(?, ?, ?, ?);';
+//         const insertCardQuery = 'INSERT INTO CardIt.Card(list_idx, card_name, card_end_date, card_order, card_content, card_mark) VALUES(?, ?, ?, ?, ?, 0);';
+//         const insertedIdQuery = 'SELECT LAST_INSERT_ID() AS insertedId;';
+//         const updateListQuery = 'UPDATE CardIt.List SET ? WHERE board_idx = ? AND list_idx = ?';
+//         const deleteListQuery = 'DELETE FROM CardIt.List WHERE list_idx = ?';
+//         const deleteCardQuery = 'DELETE FROM CardIt.Card WHERE list_idx = ?';
+//         const insertHistoryQuery = 'INSERT INTO CardIt.History(board_idx, history_string) VALUES(?, ?)';
+
+//         const user = await db.execute2(getUserQuery,ID);
+//         const user_name = user[0].user_name;
+
+//         let Break = new Error('Break');
+//         let success = 1;
+//         let history;
+
+//         try{
+//             insertedList.forEach(function(item) {
+//                 result = await db.queryParam_Arr(insertListQuery, [board_idx, item.list_name, item.list_position_x, item.list_position_y]);
+//                 if(!result) { res.status(500).send({ message: "Internel Server Error" }); success = 0; throw Break; }
+//                 history = user_name + " insert a " + item.list_name.toString() + " list";
+//                 result = await db.execute3(insertHistoryQuery, board_idx, history);
+//                 if(!result) { res.status(500).send({ message: "Internel Server Error" }); success = 0; throw Break; }
+                
+//                 item.card.forEach(function(item) {
+//                     const result = await db.queryParam_None(insertedIdQuery);
+//                     list_idx = result[0].insertedId;
+
+//                     result = await db.queryParam_Arr(insertCardQuery, [list_idx, item.card_name, item.card_end_date, item.card_order, item.card_content]);
+//                     if(!result) { res.status(500).send({ message: "Internel Server Error" }); success = 0; throw Break; }
+
+//                     history = user_name + " deleted a " + list_name.toString() + " card into " + item.list_name.toString() + " list";
+//                     result = await db.execute3(insertHistoryQuery, board_idx, history);
+//                     if(!result) { res.status(500).send({ message: "Internel Server Error" }); success = 0; throw Break; }
+//                 });
+//             });
+
+//             updatedList.forEach(function(item) {
+//                 let getUpdateList = await db.execute4(updateListQuery, data, board_idx, list_idx);
+//             });
+
+//             deletedList.forEach(function(item) {
+//                 result = await db.execute2(deleteCardQuery, item.list_idx);
+//                 if(!result) { res.status(500).send({ message: "Internel Server Error" }); success = 0; throw Break; }
+
+//                 result = await db.execute2(deleteListQuery, item.list_idx);
+//                 if(!result) { res.status(500).send({ message: "Internel Server Error" }); success = 0; throw Break; }
+
+//             });
+            
+//             if(success == 1) {
+//                 res.status(201).send({
+//                     message: "Successful Update List"
+//                 });
+//             }
+//         } catch (e) {
+//             if(e != Break) throw Break;
+//         }
+
+//     } else {
+//         res.status(403).send({
+//             message: 'Access Denied'
+//         });
+//     }
+
+// });
+
 module.exports = router;

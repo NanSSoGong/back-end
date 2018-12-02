@@ -14,7 +14,7 @@ router.post('/',async(req, res) =>{
 		});
 	}else{
 		//user_id 로 index를 가져옴.
-		let checkQuery = 'SELECT * FROM CardIt.User WHERE user_id = ?';
+		let checkQuery = 'SELECT user_idx, user_name, user_phone, user_email, user_id FROM CardIt.User WHERE user_id = ?';
 		let checkResult = await db.execute2(checkQuery, user_id);	
 
 		if (!checkResult) {		//쿼리문 에러
@@ -28,7 +28,7 @@ router.post('/',async(req, res) =>{
     	        res.status(201).send({
 	                message: "Login Success",	//login 성공 
 					data : {
-						message : checkResult,
+						result : checkResult,
 						token : token
 					}
 	            });

@@ -36,7 +36,7 @@ router.get('/emergency/:board_idx',async(req,res) =>{
     const ID = jwt.verify(req.headers.authorization);
     if(ID != -1){
         const board_idx = req.params.board_idx;
-        const getEmergencyQuery = 'SELECT card_name, list_name, board_name, card_mark FROM CardIt.Card a INNER JOIN CardIt.List b on a.list_idx = b.list_idx INNER JOIN CardIt.Board c on b.board_idx = c.board_idx where card_end_date > (NOW() - INTERVAL 7 DAY) AND c.board_idx = ?;';
+        const getEmergencyQuery = 'SELECT card_name, list_name, board_name, card_mark FROM CardIt.Card a INNER JOIN CardIt.List b on a.list_idx = b.list_idx INNER JOIN CardIt.Board c on b.board_idx = c.board_idx where card_end_date > (NOW() - INTERVAL 7 DAY) AND c.board_idx = ? LIMIT 5;';
         const result = await db.execute2(getEmergencyQuery, board_idx);
 
         if(!result){

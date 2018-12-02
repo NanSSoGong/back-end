@@ -10,6 +10,7 @@
     "cookie-parser": "~1.4.3",
     "cors": "^2.8.5",
     "crypto-promise": "^2.0.0",
+    "data-utils": "0.0.2",
     "date-utils": "^1.2.21",
     "debug": "~2.6.9",
     "express": "~4.16.0",

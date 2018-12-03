@@ -3,7 +3,6 @@ const router = express.Router();
 const crypto = require('crypto-promise');
 const db = require('../../module/pool.js');
 const jwt = require('../../module/jwt.js');
-let moment = require('moment');
 
 //Get Card in Home in user
 router.get('/',async(req,res) =>{

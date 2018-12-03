@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const crypto = require('crypto-promise');
 const db = require('../../module/pool.js');
+const jwt = require('../../module/jwt.js');
 
 //유저 가져오기
 router.get('/',async(req,res) =>{
@@ -10,8 +11,9 @@ router.get('/',async(req,res) =>{
     if(ID != -1){
         const user_id = req.body.user_id;
         let getUserQuery, result;
+        console.log(user_id);
         if (!user_id || user_id == "") {
-            getUserQuery = 'SELECT * FROM CardIt.User';
+            getUserQuery = 'SELECT * FROM CardIt.User;';
             result = await db.execute1(getUserQuery);
         }
         else{

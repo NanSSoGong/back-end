@@ -3,6 +3,7 @@ const router = express.Router();
 const crypto = require('crypto-promise');
 const db = require('../../module/pool.js');
 const jwt = require('../../module/jwt.js');
+let moment = require('moment');
 
 //Get Card in Home in user
 router.get('/',async(req,res) =>{
@@ -40,11 +41,11 @@ router.get('/emergency/:user_idx/:board_idx',async(req,res) =>{
         let getEmergencyQuery, result;
 
         if (board_idx && board_idx != -1) {
-            getEmergencyQuery = 'SELECT card_name, list_name, board_name, card_mark FROM CardIt.Card a INNER JOIN CardIt.List b on a.list_idx = b.list_idx INNER JOIN CardIt.Board c on b.board_idx = c.board_idx where card_end_date > (NOW() - INTERVAL 7 DAY) AND c.board_idx = ? LIMIT 5;';
-            result = await db.execute2(getEmergencyQuery, board_idx);
+            getEmergencyQuery = 'SELECT card_name, list_name, board_name, card_mark, card_end_date, DATEDIFF(card_end_date, NOW()) as d_day FROM CardIt.Card a INNER JOIN CardIt.List b on a.list_idx = b.list_idx INNER JOIN CardIt.Board c on b.board_idx = c.board_idx where card_end_date > (NOW() - INTERVAL 7 DAY) AND c.board_idx = ? LIMIT 5;';
+            result = await db.execute2(getEmergencyQuery, board_idx);            
         }
         else {
-            getEmergencyQuery = 'SELECT card_name, list_name, board_name, card_mark FROM CardIt.Card a INNER JOIN CardIt.List b on a.list_idx = b.list_idx INNER JOIN CardIt.Board c on b.board_idx = c.board_idx INNER JOIN CardIt.Link d on d.board_idx = c.board_idx WHERE card_end_date > (NOW() - INTERVAL 7 DAY) AND d.user_idx =?;';
+            getEmergencyQuery = 'SELECT card_name, list_name, board_name, card_mark, card_end_date, DATEDIFF(card_end_date, NOW()) as d_day FROM CardIt.Card a INNER JOIN CardIt.List b on a.list_idx = b.list_idx INNER JOIN CardIt.Board c on b.board_idx = c.board_idx INNER JOIN CardIt.Link d on d.board_idx = c.board_idx WHERE card_end_date > (NOW() - INTERVAL 7 DAY) AND d.user_idx =?;';
             result = await db.execute2(getEmergencyQuery, user_idx);
         }
 
@@ -78,11 +79,11 @@ router.get('/:user_idx/:board_idx',async(req,res) =>{
             let getEmergencyQuery;
             let result;
             if (board_idx && board_idx != -1) {
-                getEmergencyQuery = 'SELECT a.card_name, b.list_name, c.board_name, a.card_end_date, a.card_content, a.card_mark FROM CardIt.Card a INNER JOIN CardIt.List b on a.list_idx = b.list_idx INNER JOIN CardIt.Board c on b.board_idx = c.board_idx where substr(a.card_end_date,1,7)  =? AND c.board_idx = ?;';
+                getEmergencyQuery = 'SELECT a.card_name, b.list_name, c.board_name, a.card_end_date, a.card_content, a.card_mark, DATEDIFF(a.card_end_date, NOW()) as d_day FROM CardIt.Card a INNER JOIN CardIt.List b on a.list_idx = b.list_idx INNER JOIN CardIt.Board c on b.board_idx = c.board_idx where substr(a.card_end_date,1,7)  =? AND c.board_idx = ?;';
                 result = await db.execute3(getEmergencyQuery, card_month_date, board_idx);
             }
             else {
-                getEmergencyQuery = 'SELECT a.card_name, b.list_name, c.board_name, a.card_end_date, a.card_content, a.card_mark FROM CardIt.Card a INNER JOIN CardIt.List b on a.list_idx = b.list_idx INNER JOIN CardIt.Board c on b.board_idx = c.board_idx INNER JOIN CardIt.Link d on c.board_idx = d.board_idx WHERE substr(a.card_end_date,1,7)  = ? AND d.user_idx = ?;';
+                getEmergencyQuery = 'SELECT a.card_name, b.list_name, c.board_name, a.card_end_date, a.card_content, a.card_mark, DATEDIFF(a.card_end_date, NOW()) as d_day FROM CardIt.Card a INNER JOIN CardIt.List b on a.list_idx = b.list_idx INNER JOIN CardIt.Board c on b.board_idx = c.board_idx INNER JOIN CardIt.Link d on c.board_idx = d.board_idx WHERE substr(a.card_end_date,1,7)  = ? AND d.user_idx = ?;';
                 result = await db.execute3(getEmergencyQuery, card_month_date, user_idx);
             }
 

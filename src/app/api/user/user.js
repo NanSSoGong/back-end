@@ -11,14 +11,13 @@ router.get('/',async(req,res) =>{
     if(ID != -1){
         const user_id = req.body.user_id;
         let getUserQuery, result;
-        console.log(user_id);
-        if (!user_id || user_id == "") {
-            getUserQuery = 'SELECT * FROM CardIt.User;';
+        if (!user_id || user_id == "") { //아이디가 입력되지 않은 경우 전체 검색
+            getUserQuery = 'SELECT user_idx, user_name, user_id, user_phone, user_email FROM CardIt.User;';
             result = await db.execute1(getUserQuery);
         }
-        else{
-            getUserQuery = 'SELECT * FROM CardIt.User WHERE user_id = ?;';
-            result = await db.execute2(getUserQuery, user_id);
+        else{ //아이디 전방 일치 검색
+            getUserQuery = "SELECT user_idx, user_name, user_id, user_phone, user_email FROM CardIt.User WHERE user_id LIKE '" + user_id + "%';";
+            result = await db.execute1(getUserQuery);
         }
 
         if(!result){

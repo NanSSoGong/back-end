@@ -60,15 +60,12 @@ router.post('/:user_idx', async (req, res) =>{
             } else{
                 let board_idx;
                 const insertQuery = 'INSERT INTO CardIt.Board(board_name, board_background) VALUES(?, ?);';
-                const insertResult = await db.execute3(insertQuery, board_name, board_background);
-
+                let insertResult = await db.execute3(insertQuery, board_name, board_background);
+                board_idx = insertResult.insertId;
+                console.log(board_idx);
                 if(!insertResult){
                     res.status(500).send({message : "Internal Server Error2"});
                 } else{
-                    const checkQuery = 'SELECT LAST_INSERT_ID() AS insertedId;';
-                    const result = await db.queryParam_None(checkQuery);
-                    board_idx = result[0].insertedId;
-
                     const insertQuery = 'INSERT INTO CardIt.Link(user_idx, board_idx, board_master) VALUES(?, ?, ?);';
                     const insertResult = await db.execute4(insertQuery, user_idx, board_idx, 1);
                     
@@ -80,7 +77,7 @@ router.post('/:user_idx', async (req, res) =>{
                         console.log(board_idx);
                         const history_result = await db.execute4(insertHistoryQuery,board_idx,history_info,d);
                         if(!history_result) console.log("history fail");
-                        res.status(201).send({message : "Successful Add Board"});
+                        res.status(201).send({message : "Successful Add Board", board_idx : board_idx});
                     }
                 }
             }

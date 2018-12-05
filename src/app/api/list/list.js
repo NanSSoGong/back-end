@@ -77,10 +77,12 @@ router.delete('/:board_idx/:list_idx', async(req,res)=> {
     const ID = jwt.verify(req.headers.authorization);
     const board_idx = req.params.board_idx;
     const list_idx = req.params.list_idx;
+    const list_name = req.body.list_name;
 
     const getUserQuery = 'SELECT user_name FROM CardIt.User WHERE user_idx = ?';
     const deleteListQuery = "DELETE FROM CardIt.List WHERE board_idx = ? AND list_idx = ?";
     const insertHistoryQuery = 'INSERT INTO CardIt.History(board_idx,history_string,history_date) VALUES(?,?,?)';
+    console.log(d);
 
     if(ID != -1){
         const user_name = await db.execute2(getUserQuery,ID);
@@ -88,6 +90,11 @@ router.delete('/:board_idx/:list_idx', async(req,res)=> {
         if(!result){
             res.status(500).send({
                 message: "Internel Server Error"
+            });
+        }
+        else if (result.affectedRows == 0){
+            res.status(501).send({
+                message: "There is no match list"
             });
         }
         else{

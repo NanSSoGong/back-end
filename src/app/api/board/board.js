@@ -54,7 +54,7 @@ router.post('/:user_idx', async (req, res) =>{
             const user_name = await db.execute2(getUserQuery,ID);
 
             if(!checkResult){
-                res.status(500).send({mesaage : "Internal Server Error"});
+                res.status(500).send({mesaage : "Internal Server Error1"});
             } else if(checkResult[0].count > 0){
                 res.status(400).send({message : board_name + " board is already exist."});
             } else{
@@ -63,7 +63,7 @@ router.post('/:user_idx', async (req, res) =>{
                 const insertResult = await db.execute3(insertQuery, board_name, board_background);
 
                 if(!insertResult){
-                    res.status(500).send({message : "Internal Server Error"});
+                    res.status(500).send({message : "Internal Server Error2"});
                 } else{
                     const checkQuery = 'SELECT LAST_INSERT_ID() AS insertedId;';
                     const result = await db.queryParam_None(checkQuery);
@@ -73,7 +73,7 @@ router.post('/:user_idx', async (req, res) =>{
                     const insertResult = await db.execute4(insertQuery, user_idx, board_idx, 1);
                     
                     if(!insertResult){
-                        res.status(500).send({message : "Internal Server Error"});
+                        res.status(500).send({message : "Internal Server Error3"});
                     } else{
                         const history_info= user_name[0].user_name + " created a " + board_name.toString() + " board";
                         console.log(d);

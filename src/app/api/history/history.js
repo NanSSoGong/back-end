@@ -11,13 +11,13 @@ router.get('/:board_idx',async(req,res) =>{
     if(ID != -1){
         const board_idx = req.params.board_idx;
 
-        const getListQuery = 'SELECT *,DATEDIFF(history_date, NOW()) as d_day FROM CardIt.History T1 WHERE T2.board_idx = ?;';
+        const getListQuery = 'SELECT *,DATEDIFF(history_date, NOW()) as d_day FROM CardIt.History WHERE board_idx = ?;';
         const result = await db.execute2(getListQuery, board_idx);
         if(!result){
             res.status(500).send({message: "Internel Server Error"});
         } else{
             res.status(201).send({
-                message: "Successful Get Card",
+                message: "Successful Get History",
                 data : result
             });
         }

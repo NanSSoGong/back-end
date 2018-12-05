@@ -67,7 +67,8 @@ router.post('/:board_idx',async(req, res) =>{
         }
     }else{
         res.status(403).send({
-            message: 'Access Denied'
+            message: 'Access Denied',
+            card_idx : insertResult.insertId
         });
     }
 });

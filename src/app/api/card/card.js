@@ -60,7 +60,7 @@ router.post('/:board_idx/:list_idx', async (req, res) =>{
             } else{
                 const history_info= user_name[0].user_name + " added a " + card_name.toString() + " card";
                 const history_result = await db.execute4(insertHistoryQuery,board_idx,history_info,d);
-                res.status(201).send({message : "Successful Add Card"});
+                res.status(201).send({message : "Successful Add Card", card_idx : insertResult.insertId});
             }
         }
     } else{

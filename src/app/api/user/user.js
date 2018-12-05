@@ -5,7 +5,7 @@ const db = require('../../module/pool.js');
 const jwt = require('../../module/jwt.js');
 
 //유저 가져오기
-router.get('/',async(req,res) =>{
+router.post('/',async(req,res) =>{
     const ID = jwt.verify(req.headers.authorization);
 
     if(ID != -1){

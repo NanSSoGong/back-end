@@ -107,9 +107,6 @@ router.delete('/:user_idx/:board_idx/:board_master', async(req,res)=> {
             const deleteResult1 = await db.execute2(deleteListQuery1, board_idx);
             const deleteResult2 = await db.execute2(deleteListQuery2, board_idx);
             const deleteResult3 = await db.execute2(deleteListQuery3, board_idx);
-            console.log(deleteResult1);
-            console.log(deleteResult2);
-            console.log(deleteResult3);
 
             if(!deleteResult1 || !deleteResult2 || !deleteResult3){
                 res.status(500).send({message: "Internel Server Error"});

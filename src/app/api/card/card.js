@@ -51,7 +51,7 @@ router.post('/:board_idx/:list_idx', async (req, res) =>{
             });
         } else {
             const insertQuery = 'INSERT INTO CardIt.Card(list_idx, card_name, card_end_date, card_order, card_content, card_mark) VALUES(?, ?, ?, ?, ?, 0);';
-            const insertResult = await db.queryParam_Arr(insertQuery, [card_name, card_end_date, card_order, card_content]);
+            const insertResult = await db.queryParam_Arr(insertQuery, [list_idx, card_name, card_end_date, card_order, card_content]);
             //insert history
             const insertHistoryQuery = 'INSERT INTO CardIt.History(board_idx,history_string,history_date) VALUES(?,?,?)';
 

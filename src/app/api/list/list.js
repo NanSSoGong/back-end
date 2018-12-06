@@ -45,31 +45,38 @@ router.post('/:board_idx',async(req, res) =>{
     const list_name = req.body.list_name;
     const list_position_x = req.body.list_position_x;
     const list_position_y = req.body.list_position_y;
-
-    const getUserQuery = 'SELECT user_name FROM CardIt.User WHERE user_idx = ?';
-    const insertListQuery = 'INSERT INTO CardIt.List(board_idx,list_name,list_position_x,list_position_y) VALUES(?,?,?,?)';
-    const insertHistoryQuery = 'INSERT INTO CardIt.History(board_idx,history_string,history_date) VALUES(?,?,?)';
-
-    if(ID != -1){
-        const user_name = await db.execute2(getUserQuery,ID);
-        const result = await db.queryParam_Arr(insertListQuery, [board_idx,list_name,list_position_x,list_position_y]);
-        if(!result){
-            res.status(500).send({
-                message: "Internel Server Error"
-            });
-        }
-        else{
-            const history_info= user_name[0].user_name + " added a " + list_name.toString() + " list";
-            const history_result = await db.execute4(insertHistoryQuery,board_idx,history_info,d);
-            res.status(201).send({
-                message: "Successful Post List"
-            });
-        }
-    }else{
-        res.status(403).send({
-            message: 'Access Denied',
-            card_idx : insertResult.insertId
+    
+    if (!board_idx || !list_name) {
+        res.status(400).send({
+            message : "Null Value"
         });
+    }
+    else {
+        const getUserQuery = 'SELECT user_name FROM CardIt.User WHERE user_idx = ?';
+        const insertListQuery = 'INSERT INTO CardIt.List(board_idx,list_name,list_position_x,list_position_y) VALUES(?,?,?,?)';
+        const insertHistoryQuery = 'INSERT INTO CardIt.History(board_idx,history_string,history_date) VALUES(?,?,?)';
+
+        if(ID != -1){
+            const user_name = await db.execute2(getUserQuery,ID);
+            const result = await db.queryParam_Arr(insertListQuery, [board_idx,list_name,list_position_x,list_position_y]);
+            if(!result){
+                res.status(500).send({
+                    message: "Internel Server Error"
+                });
+            }
+            else{
+                const history_info= user_name[0].user_name + " added a " + list_name + " list";
+                const history_result = await db.execute4(insertHistoryQuery,board_idx,history_info,d);
+                res.status(201).send({
+                    message: "Successful Post List"
+                });
+            }
+        }else{
+            res.status(403).send({
+                message: 'Access Denied',
+                card_idx : insertResult.insertId
+            });
+        }
     }
 });
 
@@ -79,38 +86,45 @@ router.delete('/:board_idx/:list_idx', async(req,res)=> {
     const board_idx = req.params.board_idx;
     const list_idx = req.params.list_idx;
     const list_name = req.body.list_name;
-
-    const getUserQuery = 'SELECT user_name FROM CardIt.User WHERE user_idx = ?';
-    const deleteListQuery = "DELETE FROM CardIt.List WHERE board_idx = ? AND list_idx = ?";
-    const insertHistoryQuery = 'INSERT INTO CardIt.History(board_idx,history_string,history_date) VALUES(?,?,?)';
-    console.log(d);
-
-    if(ID != -1){
-        const user_name = await db.execute2(getUserQuery,ID);
-        const result = await db.execute3(deleteListQuery,board_idx,list_idx);
-        if(!result){
-            res.status(500).send({
-                message: "Internel Server Error"
-            });
-        }
-        else if (result.affectedRows == 0){
-            res.status(501).send({
-                message: "There is no match list"
-            });
-        }
-        else{
-            const history_info= user_name[0].user_name + " deleted a " + list_name.toString() + " list";
-            const history_result = await db.execute4(insertHistoryQuery,board_idx,history_info,d);
-            res.status(201).send({
-                message: "Successful Delete List"
-            });
-        }
-    }else{
-        res.status(403).send({
-            message: 'Access Denied'
+    if (!board_idx || !list_idx || !list_name) {
+        res.status(400).send({
+            message : "Null Value"
         });
     }
+    else {
+        const getUserQuery = 'SELECT user_name FROM CardIt.User WHERE user_idx = ?';
+        const deleteCardQuery = "DELETE FROM CardIt.Card WHERE list_idx = ?";
+        const deleteListQuery = "DELETE FROM CardIt.List WHERE board_idx = ? AND list_idx = ?";
+        const insertHistoryQuery = 'INSERT INTO CardIt.History(board_idx,history_string,history_date) VALUES(?,?,?)';
+        console.log(d);
 
+        if(ID != -1){
+            const user_name = await db.execute2(getUserQuery,ID);
+            const cardDeleteResult = await db.execute2(deleteCardQuery,list_idx);
+            const listDeleteResult = await db.execute3(deleteListQuery,board_idx,list_idx);
+            if(!cardDeleteResult || !listDeleteResult){
+                res.status(500).send({
+                    message: "Internel Server Error"
+                });
+            }
+            else if (listDeleteResult.affectedRows == 0){
+                res.status(501).send({
+                    message: "There is no match list"
+                });
+            }
+            else{
+                const history_info= user_name[0].user_name + " deleted a " + list_name.toString() + " list";
+                const history_result = await db.execute4(insertHistoryQuery,board_idx,history_info,d);
+                res.status(201).send({
+                    message: "Successful Delete List"
+                });
+            }
+        }else{
+            res.status(403).send({
+                message: 'Access Denied'
+            });
+        }
+    }
 });
 
 //리스트 수정하기

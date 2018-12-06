@@ -181,37 +181,4 @@ router.put('/:board_idx/:user_idx', async(req,res)=>{
 
 });
 
-//Share Board
-router.link('/:user_idx/:board_idx', async(req,res)=>{
-    const ID = jwt.verify(req.headers.authorization);
-
-    if(ID != -1){
-        const user_idx = req.params.user_idx;
-        const board_idx = req.params.board_idx;
-    
-        const getListQuery = 'SELECT * FROM CardIt.Board WHERE board_idx = ?';
-        const getList = await db.execute2(getListQuery, board_idx);
-
-        if(!getList){
-            res.status(500).send({
-                message: "Cannot Find The Board From DB"
-            });
-        } else{
-            const insertQuery = 'INSERT INTO CardIt.Link(user_idx, board_idx, board_master) VALUES(?, ?, 0);';
-            const insertResult = await db.execute3(insertQuery, user_idx, board_idx);
-
-            if (!insertResult) {
-                res.status(404).send({message: "Fail To Share Board"});
-            } else {
-                res.status(201).send({message: "Successful Share Board"});
-            }
-        }
-    } else{
-        res.status(403).send({
-            message: 'Access Denied'
-        });
-    }
-
-});
-
 module.exports = router;

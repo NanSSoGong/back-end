@@ -38,4 +38,52 @@ router.post('/',async(req,res) =>{
     }
 });
 
+//Share Board
+router.put('/share/:board_idx', async(req,res)=>{
+    const ID = jwt.verify(req.headers.authorization);
+
+    if(ID != -1){
+        const board_idx = req.params.board_idx;
+        const user_idx = JSON.parse(req.body.user_idx);
+        let values = [];
+        if (!user_idx || !Array.isArray(user_idx)) {
+            res.status(400).send({
+                message: "Null Value!"
+            });
+        }
+        else {
+            const board_idx_int = parseInt(board_idx);
+            user_idx.forEach(user => {
+                values.push([user, board_idx_int, 0]);
+            });
+            values.forEach(val => {
+                console.log(val);
+            });
+
+            const getListQuery = 'SELECT * FROM CardIt.Board WHERE board_idx = ?';
+            const getList = await db.execute2(getListQuery, board_idx);
+
+            if(!getList){
+                res.status(500).send({
+                    message: "Cannot Find The Board From DB"
+                });
+            } else{
+                const insertQuery = 'INSERT INTO CardIt.Link(user_idx, board_idx, board_master) VALUES ?;';
+                const insertResult = await db.execute2(insertQuery, [values]);
+
+                if (!insertResult) {
+                    res.status(404).send({message: "Fail To Share Board"});
+                } else {
+                    res.status(201).send({message: "Successful Share Board"});
+                }
+            }
+        }
+    } else{
+        res.status(403).send({
+            message: 'Access Denied'
+        });
+    }
+
+});
+
 module.exports = router;

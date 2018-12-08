@@ -107,6 +107,7 @@ router.put('/:board_idx/:list_idx/:card_idx', async(req,res)=>{
     if(ID != -1){
         const list_idx = req.params.list_idx;
         const card_idx = req.params.card_idx;
+        const new_list_idx = req.body.new_list_idx;
         const card_name = req.body.card_name;
         const card_end_date = !req.body.card_end_date ? null : req.body.card_end_date;
         const card_content = !req.body.card_content ? null : req.body.card_content;
@@ -119,7 +120,7 @@ router.put('/:board_idx/:list_idx/:card_idx', async(req,res)=>{
             });
         } else {
             const updateQuery = 'UPDATE CardIt.Card SET list_idx = ?, card_name = ?, card_end_date = ?, card_order = ?, card_content = ?, card_mark = ? WHERE card_idx = ?;';
-            const updateResult = await db.queryParam_Arr(updateQuery, [list_idx, card_name, card_end_date, card_order, card_content, card_mark, card_idx]);
+            const updateResult = await db.queryParam_Arr(updateQuery, [new_list_idx, card_name, card_end_date, card_order, card_content, card_mark, card_idx]);
 
             if(!updateResult){
                 res.status(404).send({message: "Fail To Update Card"});

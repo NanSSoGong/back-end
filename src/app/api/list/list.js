@@ -65,10 +65,11 @@ router.post('/:board_idx',async(req, res) =>{
                 });
             }
             else{
+                console.log(result);
                 const history_info= user_name[0].user_name + " added a " + list_name + " list";
                 const history_result = await db.execute4(insertHistoryQuery,board_idx,history_info,d);
                 res.status(201).send({
-                    message: "Successful Post List"
+                    message: "Successful Post List", list_idx : result.insertId
                 });
             }
         }else{

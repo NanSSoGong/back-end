@@ -4,6 +4,9 @@ const crypto = require('crypto-promise');
 const db = require('../../module/pool.js');
 const jwt = require('../../module/jwt.js');
 
+var dt = new Date();
+var d = dt.toFormat('YYYY-MM-DD');
+
 //Get Board List
 router.get('/:user_idx',async(req,res) =>{
     const ID = jwt.verify(req.headers.authorization);
@@ -43,7 +46,7 @@ router.post('/:user_idx', async (req, res) =>{
         } else {
             //Check Duplication
             const checkQuery = "SELECT Count(*) AS count FROM CardIt.Board T1 LEFT JOIN CardIt.Link T2 ON T1.board_idx = T2.board_idx WHERE T1.board_name = ? AND T2.user_idx = ?";
-            const insertHistoryQuery = 'INSERT INTO CardIt.History(board_idx,history_string) VALUES(?,?)';
+            const insertHistoryQuery = 'INSERT INTO CardIt.History(board_idx,history_string,history_date) VALUES(?,?,?)';
             const checkResult = await db.execute3(checkQuery, board_name, user_idx);
 
             const user_name = await db.execute2(getUserQuery,ID);
@@ -71,7 +74,7 @@ router.post('/:user_idx', async (req, res) =>{
                         res.status(500).send({message : "Internal Server Error"});
                     } else{
                         const history_info= user_name[0].user_name + " added a " + board_name.toString() + " board";
-                        const history_result = await db.execute3(insertHistoryQuery,board_idx,history_info);
+                        const history_result = await db.execute3(insertHistoryQuery,board_idx,history_info,d);
                         res.status(201).send({message : "Successful Add Board"});
                     }
                 }

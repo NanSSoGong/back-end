@@ -137,4 +137,51 @@ router.put('/:board_idx/:list_idx/:card_idx', async(req,res)=>{
 
 });
 
+//Edit Card Order
+router.put('/order/:card_idx', async(req,res)=>{
+    const ID = jwt.verify(req.headers.authorization);
+
+    if(ID != -1){
+        const card_idx = req.params.card_idx;
+        const ori_list_idx = req.body.ori_list_idx;
+        const new_list_idx = req.body.new_list_idx;
+        const ori_order = req.body.ori_order;
+        const new_order = req.body.new_order;
+
+        console.log(ori_list_idx);
+        console.log(new_list_idx);
+        console.log(ori_order);
+        console.log(new_order);
+        if (!card_idx || !ori_list_idx || !new_list_idx || !ori_order || !new_order) {
+            res.status(400).send({
+                message : "Null Value"
+            });
+        } else {
+            const updateFromCardQuery = "Update CardIt.Card SET card_order = card_order - 1 WHERE list_idx = ? AND card_order > ?;";
+            const updateFromResult = await db.execute3(updateFromCardQuery, ori_list_idx, ori_order);
+
+            const updateToCardQuery = "Update CardIt.Card SET card_order = card_order + 1 WHERE list_idx = ? AND card_order >= ?;";
+            const updateToResult = await db.execute3(updateToCardQuery, new_list_idx, new_order);
+
+            const updateMoveCardQuery = "Update CardIt.Card SET list_idx = ?, card_order = ? WHERE card_idx = ?;";
+            const updateMoveResult = await db.execute4(updateMoveCardQuery, new_list_idx, new_order, card_idx);
+
+            console.log(updateToResult);
+            console.log(updateMoveResult);
+            console.log(updateFromResult);
+            if(!updateToResult || !updateMoveResult || !updateFromResult || updateMoveResult.affectedRows == 0){
+                res.status(500).send({message: "Fail To Update Card Order"});
+            } else {
+                res.status(201).send({message: "Successful Update Card"});
+            }
+            
+        }
+    } else{
+        res.status(403).send({
+            message: 'Access Denied'
+        });
+    }
+
+});
+
 module.exports = router;

@@ -14,13 +14,13 @@ router.post('/:board_idx',async(req,res) =>{
         let getUserQuery, result;
         if (!user_id || user_id == "") { //아이디가 입력되지 않은 경우 전체 검색
             //getUserQuery = 'SELECT user_idx, user_name, user_id, user_phone, user_email FROM CardIt.User;';
-            getUserQuery = 'SELECT T1.user_idx, T1.user_name, T1.user_id, T1.user_phone, T1.user_email FROM CardIt.User T1 LEFT JOIN (SELECT * FROM CardIt.Link WHERE board_idx = 1) T2 ON T1.user_idx = T2.user_idx WHERE T2.board_idx is null;';
+            getUserQuery = 'SELECT T1.user_idx, T1.user_name, T1.user_id, T1.user_phone, T1.user_email FROM CardIt.User T1 LEFT JOIN (SELECT * FROM CardIt.Link WHERE board_idx = ?) T2 ON T1.user_idx = T2.user_idx WHERE T2.board_idx is null;';
         }
         else{ //아이디 전방 일치 검색
             //getUserQuery = "SELECT user_idx, user_name, user_id, user_phone, user_email FROM CardIt.User WHERE user_id LIKE '" + user_id + "%';";
-            getUserQuery = "SELECT T1.user_idx, T1.user_name, T1.user_id, T1.user_phone, T1.user_email FROM CardIt.User T1 LEFT JOIN (SELECT * FROM CardIt.Link WHERE board_idx = 1) T2 ON T1.user_idx = T2.user_idx WHERE T2.board_idx is null AND T1.user_id LIKE '" + user_id + "%';";
+            getUserQuery = "SELECT T1.user_idx, T1.user_name, T1.user_id, T1.user_phone, T1.user_email FROM CardIt.User T1 LEFT JOIN (SELECT * FROM CardIt.Link WHERE board_idx = ?) T2 ON T1.user_idx = T2.user_idx WHERE T2.board_idx is null AND T1.user_id LIKE '" + user_id + "%';";
         }
-        result = await db.execute1(getUserQuery);
+        result = await db.execute2(getUserQuery, board_idx);
 
         if(!result){
             res.status(500).send({

@@ -41,6 +41,7 @@ router.post('/:board_idx/:list_idx', async (req, res) =>{
         const card_end_date = !req.body.card_end_date ? null : req.body.card_end_date;
         const card_order = !req.body.card_order ? 1 : req.body.card_order;
         const card_content = !req.body.card_content ? null : req.body.card_content;
+        const card_mark = !req.body.card_mark ? 0 : req.body.card_mark;
         //get user name
         const getUserQuery = 'SELECT user_name FROM CardIt.User WHERE user_idx = ?';
         const user_name = await db.execute2(getUserQuery,ID);
@@ -50,8 +51,8 @@ router.post('/:board_idx/:list_idx', async (req, res) =>{
                 message : "Null Value"
             });
         } else {
-            const insertQuery = 'INSERT INTO CardIt.Card(list_idx, card_name, card_end_date, card_order, card_content, card_mark) VALUES(?, ?, ?, ?, ?, 0);';
-            const insertResult = await db.queryParam_Arr(insertQuery, [list_idx, card_name, card_end_date, card_order, card_content]);
+            const insertQuery = 'INSERT INTO CardIt.Card(list_idx, card_name, card_end_date, card_order, card_content, card_mark) VALUES(?, ?, ?, ?, ?, ?);';
+            const insertResult = await db.queryParam_Arr(insertQuery, [list_idx, card_name, card_end_date, card_order, card_content, card_mark]);
             //insert history
             const insertHistoryQuery = 'INSERT INTO CardIt.History(board_idx,history_string,history_date) VALUES(?,?,?)';
 

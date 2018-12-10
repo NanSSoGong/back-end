@@ -46,7 +46,7 @@ router.post('/:user_idx', async (req, res) =>{
         } else {
             //Check Duplication
             const checkQuery = "SELECT Count(*) AS count FROM CardIt.Board T1 LEFT JOIN CardIt.Link T2 ON T1.board_idx = T2.board_idx WHERE T1.board_name = ? AND T2.user_idx = ?";
-            const insertHistoryQuery = 'INSERT INTO CardIt.History(board_idx,history_string,history_date) VALUES(?,?,?)';
+            const insertHistoryQuery = 'INSERT INTO CardIt.History(board_idx,history_string) VALUES(?,?)';
             const checkResult = await db.execute3(checkQuery, board_name, user_idx);
 
             const user_name = await db.execute2(getUserQuery,ID);
@@ -56,26 +56,22 @@ router.post('/:user_idx', async (req, res) =>{
             } else if(checkResult[0].count > 0){
                 res.status(400).send({message : board_name + " board is already exist."});
             } else{
-                let board_idx;
                 const insertQuery = 'INSERT INTO CardIt.Board(board_name, board_background) VALUES(?, ?);';
-                const insertResult = await db.execute3(insertQuery, board_name, board_background);
+                const insertBoardResult = await db.execute3(insertQuery, board_name, board_background);
 
-                if(!insertResult){
+                if(!insertBoardResult){
                     res.status(500).send({message : "Internal Server Error"});
                 } else{
-                    const checkQuery = 'SELECT LAST_INSERT_ID() AS insertedId;';
-                    const result = await db.queryParam_None(checkQuery);
-                    board_idx = result[0].insertedId;
-
+                    const board_idx = insertBoardResult.insertId;
                     const insertQuery = 'INSERT INTO CardIt.Link(user_idx, board_idx, board_master) VALUES(?, ?, ?);';
-                    const insertResult = await db.execute4(insertQuery, user_idx, board_idx, 1);
+                    const insertLinkResult = await db.execute4(insertQuery, user_idx, board_idx, 1);
                     
-                    if(!insertResult){
+                    if(!insertLinkResult){
                         res.status(500).send({message : "Internal Server Error"});
                     } else{
                         const history_info= user_name[0].user_name + " added a " + board_name.toString() + " board";
-                        const history_result = await db.execute3(insertHistoryQuery,board_idx,history_info,d);
-                        res.status(201).send({message : "Successful Add Board"});
+                        const history_result = await db.execute3(insertHistoryQuery,board_idx,history_info);
+                        res.status(201).send({message : "Successful Add Board", board_idx: board_idx});
                     }
                 }
             }
